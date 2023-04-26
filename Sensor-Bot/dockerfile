@@ -1,4 +1,5 @@
 FROM python:latest
+WORKDIR /app
 
 ADD requirements.txt /
 
