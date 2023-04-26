@@ -34,6 +34,7 @@ colors = [
     0xFFB6C1,
     0x00CED1,
 ]
+home_server = False
 
 
 class MyClient(Client):
@@ -84,17 +85,18 @@ async def monitor(self):
         value=f"{round(disk_io_counters().read_bytes/1000000,2)} MB",
         inline=True,
     )
-    embed.add_field(name="Fan RPM:", value=sensors_fans()["asus"][0][1], inline=True)
-    embed.add_field(
-        name="MB Temp:",
-        value=str(sensors_temperatures()["asus"][0][1]) + C,
-        inline=True,
-    )
-    embed.add_field(
-        name="Cpu Temp:",
-        value=str(sensors_temperatures()["coretemp"][0][1]) + C,
-        inline=True,
-    )
+    if home_server:
+        embed.add_field(name="Fan RPM:", value=sensors_fans()["asus"][0][1], inline=True)
+        embed.add_field(
+            name="MB Temp:",
+            value=str(sensors_temperatures()["asus"][0][1]) + C,
+            inline=True,
+        )
+        embed.add_field(
+            name="Cpu Temp:",
+            value=str(sensors_temperatures()["coretemp"][0][1]) + C,
+            inline=True,
+        )
     embed.add_field(name="Uptime:", value=uptime, inline=True)
     embed.add_field(
         name="Ram Ussage:",
