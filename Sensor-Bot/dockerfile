@@ -1,7 +1,6 @@
 FROM python:latest
 
 ADD requirements.txt /
-ADD secrets.json /
 
 RUN pip install -r requirements.txt
 
