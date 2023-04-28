@@ -12,14 +12,30 @@ from discord import Client, Intents, Embed
 from datetime import datetime
 from discord.ext import tasks
 from random import choice
-from json import load
 from os import environ
 
 if "discordToken" in environ.keys():
+    if environ["botToken"] == "Change to your own discord bot's token":
+        raise Exception("Please change the botToken to your own discord bot's token")
     botToken = environ["botToken"]
 else:
-    with open("secerets.json", "r", encoding="utf-8") as f:
-        botToken = load(f)["botToken"]
+    raise Exception("Please set the discord bot's token as env named botToken")
+
+if "home_server" in environ.keys():
+    if environ["home_server"] == "True":
+        home_server = True
+    else:
+        home_server = False
+else:
+    home_server = False
+
+if "channelID" in environ.keys():
+    if environ["channelID"] == "Change to your own discord channel's ID":
+        raise Exception("Please change the channelID to your own channel's ID")
+    channelID = int(environ["channelID"])
+else:
+    raise Exception("Please set the discord channel's ID as env named channelID")
+
 
 colors = [
     0xFFE4E1,
@@ -39,7 +55,6 @@ colors = [
     0xFFB6C1,
     0x00CED1,
 ]
-home_server = False
 
 
 class MyClient(Client):
@@ -116,7 +131,7 @@ async def monitor(self):
     embed.set_footer(
         text=f'Last updated: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}, Last Boot: {datetime.fromtimestamp(boot_time()).strftime("%d/%m/%Y %H:%M:%S")}'
     )
-    channel = client.get_channel(1018181447128985610)
+    channel = client.get_channel(channelID)
     async for message in channel.history(limit=200):
         if message.author == self.user:
             await message.edit(embed=embed)
