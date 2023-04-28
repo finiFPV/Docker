@@ -13,9 +13,14 @@ from datetime import datetime
 from discord.ext import tasks
 from random import choice
 from json import load
+from os import environ
 
-with open("secerets.json", "r") as f:
-    botToken = load(f)["botToken"]
+if "discordToken" in environ.keys():
+    botToken = environ["botToken"]
+else:
+    with open("secerets.json", "r", encoding="utf-8") as f:
+        botToken = load(f)["botToken"]
+
 colors = [
     0xFFE4E1,
     0x00FF7F,
