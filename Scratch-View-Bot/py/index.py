@@ -73,7 +73,7 @@ def fetch():
                     "https://hidemy.name/en/proxy-list/?maxtime=2000&type=s^#list",
                     headers={
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0",
-                        "Cookie": "cf_clearance=Rjfe8xZ6rq1thxESEkSpiCaffcBcjTF_PQVhq9Yl3Tk-1682350513-0-150",
+                        "Cookie": "t=306670909; cf_clearance=Rjfe8xZ6rq1thxESEkSpiCaffcBcjTF_PQVhq9Yl3Tk-1682350513-0-150",
                     },
                     timeout=10,
                 ).content,
