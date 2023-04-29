@@ -1,0 +1,10 @@
+version: '3'
+services:
+  sensor-bot:
+    image: fininimini/scratch-view-bot:py
+    container_name: Scratch-View-Bot
+    restart: unless-stopped
+    environment:
+      mongodb_url: Change to your own mongodb url
+      scratch_project_url: Change to your own scratch project url
+      name: Change to your own chosen name for the worker
