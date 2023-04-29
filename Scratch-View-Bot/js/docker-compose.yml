@@ -1,0 +1,9 @@
+version: '3'
+services:
+  scratch-view-bot:
+    image: fininimini/scratch-view-bot:js
+    container_name: Scratch-View-Bot
+    restart: unless-stopped
+    environment:
+      MONGO_URL: Change to your own mongodb url
+      NAME: Change to your own worker's name

@@ -5,5 +5,5 @@ services:
     container_name: Sensor-Bot
     restart: unless-stopped
     environment:
-      - botToken=Change to your own discord bot's token
-      - channelID=Change to your own discord channel's ID
+      botToken: Change to your own discord bot's token
+      channelID: Change to your own discord channel's ID

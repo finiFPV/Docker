@@ -5,6 +5,6 @@ ADD requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-ADD main.py ./
+ADD index.py ./
 
-CMD [ "python", "./main.py"]
+CMD [ "python", "./index.py"]

@@ -13,29 +13,26 @@ from datetime import datetime
 from discord.ext import tasks
 from random import choice
 from os import environ
+from sys import exit
 
-if "discordToken" in environ.keys():
-    if environ["botToken"] == "Change to your own discord bot's token":
-        raise Exception("Please change the botToken to your own discord bot's token")
-    botToken = environ["botToken"]
-else:
-    raise Exception("Please set the discord bot's token as env named botToken")
+if "discordToken" not in environ:
+    exit("Please set the discord bot's token as env named botToken")
+elif environ["botToken"] == "Change to your own discord bot's token":
+    exit("Please change the botToken to your own discord bot's token")
+botToken = environ["botToken"]
 
-if "home_server" in environ.keys():
-    if environ["home_server"] == "True":
-        home_server = True
-    else:
-        home_server = False
+if "channelID" not in environ:
+    exit("Please set the discord channel's ID as env named channelID")
+elif environ["channelID"] == "Change to your own discord channel's ID":
+    exit("Please change the channelID to your own channel's ID")
+channelID = int(environ["channelID"])
+
+if "home_server" not in environ:
+    home_server = False
+elif environ["home_server"] == "True":
+    home_server = True
 else:
     home_server = False
-
-if "channelID" in environ.keys():
-    if environ["channelID"] == "Change to your own discord channel's ID":
-        raise Exception("Please change the channelID to your own channel's ID")
-    channelID = int(environ["channelID"])
-else:
-    raise Exception("Please set the discord channel's ID as env named channelID")
-
 
 colors = [
     0xFFE4E1,
