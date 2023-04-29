@@ -15,7 +15,7 @@ from random import choice
 from os import environ
 from sys import exit
 
-if "discordToken" not in environ:
+if "botToken" not in environ:
     exit("Please set the discord bot's token as env named botToken")
 elif environ["botToken"] == "Change to your own discord bot's token":
     exit("Please change the botToken to your own discord bot's token")
