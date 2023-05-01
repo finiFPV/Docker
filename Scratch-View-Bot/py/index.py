@@ -22,7 +22,9 @@ wait_time = 0
 avg_wait = 0
 last_request_time = start_time
 views_since_update = 0
+url = None
 headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
     "Accept": "*/*",
     "Accept-Language": "en-US,en;q=0.5",
     "Sec-Fetch-Dest": "empty",
@@ -39,16 +41,6 @@ elif environ["mongodb_url"] == "Change to your own mongodb url":
     exit("Please change the mongodb_url environment variable to your own mongodb url")
 mongo = MongoClient(environ["mongodb_url"])["SC_Swarm"]
 
-if "scratch_project_url" not in environ:
-    exit(
-        "Please set the scratch_project_url environment variable to your scratch project url"
-    )
-elif environ["scratch_project_url"] == "Change to your own scratch project url":
-    exit(
-        "Please change the scratch_project_url environment variable to your own scratch project url"
-    )
-project_url = environ["scratch_project_url"]
-
 if "name" not in environ:
     exit("Please set the name environment variable to your chosen name for the worker")
 elif environ["name"] == "Change to your own chosen name for the worker":
@@ -56,6 +48,10 @@ elif environ["name"] == "Change to your own chosen name for the worker":
         "Please change the name environment variable to your own chosen name for the worker"
     )
 name = environ["name"]
+
+worker = mongo["Workers"].find_one({"name": name})
+if worker is None:
+    mongo["Workers"].insert_one({"name": name, "viewsGenerated": 0})
 
 
 def log(text):
@@ -85,6 +81,7 @@ def fetch():
 
 
 def verify(proxies):
+    global views, views_since_update, url
     results = {
         "res0": [],
         "res1": [],
@@ -100,13 +97,16 @@ def verify(proxies):
         for proxy in proxies:
             try:
                 response = post(
-                    project_url,
+                    url,
                     headers=headers,
                     proxies={"https": proxy},
                     timeout=2,
                 )
                 if response.status_code == 200 and response.json() == {}:
+                    views += 1
+                    views_since_update += 1
                     results[f"res{i}"].append(proxy)
+                    log(f"Success {i + 1}: {proxy}")
             except Exception as e:
                 pass
         log(f"Finished {i + 1} round")
@@ -138,7 +138,7 @@ def proxy_list_updater(sleep_time_in_minutes=60):
     while True:
         global proxies, new_proxies, old_proxies, unfiltered_proxies, proxy_list_set, proxy_failures
         update_start_time = time()
-        for proxy in proxy_failures:
+        for proxy in proxy_failures.items():
             if proxy_failures[proxy] >= 15:
                 try:
                     proxies.remove(proxy)
@@ -183,56 +183,45 @@ def proxy_list_updater(sleep_time_in_minutes=60):
         sleep(sleep_time_in_minutes * 60)
 
 
+config = mongo["Config"].find_one()
+worker = mongo["Workers"].find_one({"name": name})
+if worker is None:
+    mongo["Workers"].insert_one({"name": name, "viewsGenerated": 0})
+    worker = mongo["Workers"].find_one({"name": name})
+url = config["url"]
 cheacker_thread = Thread(target=proxy_list_updater)
 cheacker_thread.start()
-
-
-def display_average():
-    while True:
-        if not proxy_list_set:
-            continue
-        elapsed_time = time() - start_time
-        elapsed_minutes = elapsed_time / 60
-        average_increase_per_minute = (
-            views / elapsed_minutes if elapsed_minutes > 0 else 0
-        )
-        system("clear")
-        log(
-            f"\n        Total View Count Increase: {views}"
-            + f"\n        Total Cycles: {cycles}"
-            + f"\n        Total Errors: {errors}"
-            + f"\n        Elapsed Time (minutes): {round(elapsed_minutes, 1)}"
-            + f"\n        Average View Count Increase per Minute: {round(average_increase_per_minute, 2)}"
-            + f"\n        Average Wait Time Between Requests (seconds): {round(avg_wait, 2)}"
-        )
-        sleep(30)
-
-
-average_thread = Thread(target=display_average)
-average_thread.start()
 
 while True:
     if not proxy_list_set:
         continue
-    config = mongo["Config"].find_one()
-    worker = mongo["Workers"].find_one({"name": name})
-    if worker is None:
-        mongo["Workers"].insert_one({"name": name, "viewsGenerated": 0})
-        worker = mongo["Workers"].find_one({"name": name})
-    mongo["Workers"].update_one(
-        {"name": name},
-        {"$set": {"viewsGenerated": views_since_update + worker["viewsGenerated"]}},
+    elapsed_minutes = (time() - start_time) / 60
+    system("clear")
+    log(
+        f"\n        Total View Count Increase: {views}"
+        + f"\n        Total Cycles: {cycles}"
+        + f"\n        Total Errors: {errors}"
+        + f"\n        Elapsed Time (minutes): {round(elapsed_minutes, 1)}"
+        + f"\n        Average View Count Increase per Minute: {round((views / elapsed_minutes if elapsed_minutes > 0 else 0), 2)}"
+        + f"\n        Average Wait Time Between Requests (seconds): {round(avg_wait, 2)}"
     )
+    config = mongo["Config"].find_one()
+    views_since_update = 0
     if config["active"]:
-        views_since_update = 0
+        worker = mongo["Workers"].find_one({"name": name})
+        mongo["Workers"].update_one(
+            {"name": name},
+            {"$set": {"viewsGenerated": views_since_update + worker["viewsGenerated"]}},
+        )
         for proxy in proxies:
             wait_time = time() - last_request_time
             last_request_time = time()
             avg_wait = (avg_wait + wait_time) / 2
             try:
                 response = post(
-                    config["url"], headers=headers, proxies={"https": proxy}, timeout=5
+                    url, headers=headers, proxies={"https": proxy}, timeout=5
                 )
+                print(proxy, response.status_code, response.json())
                 if response.status_code == 200 and response.json() == {}:
                     views += 1
                     views_since_update += 1

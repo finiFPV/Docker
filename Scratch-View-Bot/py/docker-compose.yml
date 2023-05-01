@@ -6,5 +6,4 @@ services:
     restart: unless-stopped
     environment:
       mongodb_url: Change to your own mongodb url
-      scratch_project_url: Change to your own scratch project url
       name: Change to your own chosen name for the worker
