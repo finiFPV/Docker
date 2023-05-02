@@ -138,12 +138,6 @@ def proxy_list_updater(sleep_time_in_minutes=60):
     while True:
         global proxies, new_proxies, old_proxies, unfiltered_proxies, proxy_list_set, proxy_failures
         update_start_time = time()
-        for proxy in proxy_failures.items():
-            if proxy_failures[proxy] >= 15:
-                try:
-                    proxies.remove(proxy)
-                except:
-                    pass
         proxy_failures = {}
         log("Updating Proxy List")
         new_proxies = unfiltered_proxies = fetch()
@@ -195,6 +189,13 @@ cheacker_thread.start()
 while True:
     if not proxy_list_set:
         continue
+    for proxy in proxy_failures.items():
+        if proxy_failures[proxy] >= 15:
+            try:
+                proxies.remove(proxy)
+                log(f"Removed proxy {proxy})
+            except:
+                pass
     elapsed_minutes = (time() - start_time) / 60
     system("clear")
     log(
