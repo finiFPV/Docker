@@ -193,7 +193,7 @@ while True:
         if proxy_failures[proxy] >= 15:
             try:
                 proxies.remove(proxy)
-                log(f"Removed proxy {proxy})
+                log(f"Removed proxy {proxy}")
             except:
                 pass
     elapsed_minutes = (time() - start_time) / 60
