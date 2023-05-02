@@ -190,12 +190,12 @@ while True:
     if not proxy_list_set:
         continue
     for proxy in proxy_failures.items():
-        if proxy_failures[proxy] >= 15:
-            try:
+        try:
+            if proxy_failures[proxy] >= 15:
                 proxies.remove(proxy)
                 log(f"Removed proxy {proxy}")
-            except:
-                pass
+        except:
+            pass
     elapsed_minutes = (time() - start_time) / 60
     system("clear")
     log(

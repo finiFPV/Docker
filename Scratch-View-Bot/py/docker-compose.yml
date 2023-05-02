@@ -7,7 +7,7 @@ services:
     environment:
       mongodb_url: Change to your own mongodb url
       name: Change to your own chosen name for the worker
-      volumes:
-        - Scratch-View-Bot:/app/
+    volumes:
+      - Scratch-View-Bot:/app/
 volumes:
   Scratch-View-Bot:
