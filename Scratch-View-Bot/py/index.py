@@ -219,7 +219,7 @@ while True:
             avg_wait = (avg_wait + wait_time) / 2
             try:
                 response = post(
-                    url, headers=headers, proxies={"https": proxy}, timeout=5
+                    url, headers=headers, proxies={"https": proxy}, timeout=2
                 )
                 print(proxy, response.status_code, response.json())
                 if response.status_code == 200 and response.json() == {}:
